@@ -1,0 +1,6 @@
+PREFIX = 'prefix/'
+MQTT_HOST = 'hostname.tld'
+MQTT_PORT = 1883
+SNMP_COMMUNITY = 'public'
+SNMP_HOST = '192.168.0.1'
+SNMP_PORT = 161
