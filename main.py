@@ -9,32 +9,32 @@ except ModuleNotFoundError:
     print('Copy over config.py.example to config.py and restart the script')
     exit(0)
 
-apTopicMap = {
-    'aiAPCPUUtilization': PREFIX + 'ap/%s/cpu_utilization',
-    'aiAPMemoryFree': PREFIX + 'ap/%s/mem_free',
-    'aiAPTotalMemory': PREFIX + 'ap/%s/mem_total',
-}
-
 
 def trigger_update(publish):
     apStats, assocAp, assocSsid = gather(SNMP_HOST, SNMP_PORT, SNMP_COMMUNITY)
     for mac, ap in apStats.items():
         for label, value in ap.items():
-            if label not in apTopicMap:
+            if label not in TOPIC_MAP:
                 continue
 
-            publish(apTopicMap[label] % ap['aiAPName'], value)
+            publish(PREFIX + TOPIC_MAP[label] % ap['aiAPName'], value)
 
-        publish(
-            PREFIX + 'ap/%s/mem_free_percentage' % ap['aiAPName'],
-            round(ap['aiAPMemoryFree'] / ap['aiAPTotalMemory'] * 100, 1)
-        )
+        if 'ap_mem_free' in TOPIC_MAP:
+            publish(
+                PREFIX + TOPIC_MAP['ap_mem_free'] % ap['aiAPName'],
+                round(ap['aiAPMemoryFree'] / ap['aiAPTotalMemory'] * 100, 1)
+            )
 
-    for mac, count in assocAp.items():
-        publish(PREFIX + 'ap/%s/clients' % apStats[mac]['aiAPName'], count)
+    if 'ap_clients' in TOPIC_MAP:
+        for mac, count in assocAp.items():
+            publish(PREFIX + TOPIC_MAP['ap_clients'] % apStats[mac]['aiAPName'], count)
 
-    for ssid, count in assocSsid.items():
-        publish(PREFIX + 'ssid/%s' % str(ssid), count)
+    if 'ssid_connected' in TOPIC_MAP:
+        for ssid, count in assocSsid.items():
+            publish(PREFIX + TOPIC_MAP['ssid_connected'] % str(ssid), count)
+
+    if 'ssid_connected_total' in TOPIC_MAP:
+        publish(PREFIX + TOPIC_MAP['ssid_connected_total'], sum(assocSsid.values()))
 
 
 if __name__ == '__main__':
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
         trigger_update(publish)
 
-        sleeptime = now + 60 - datetime.now().timestamp()
+        sleeptime = now + UPDATE_INTERVAL - datetime.now().timestamp()
         while sleeptime > 0 and not done:
             sleeptime -= 1
             time.sleep(1)

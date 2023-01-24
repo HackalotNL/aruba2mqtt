@@ -4,3 +4,17 @@ MQTT_PORT = 1883
 SNMP_COMMUNITY = 'public'
 SNMP_HOST = '192.168.0.1'
 SNMP_PORT = 161
+UPDATE_INTERVAL = 60
+
+TOPIC_MAP = {
+    # SNMP MIB's
+    'aiAPCPUUtilization': 'ap/%s/cpu_utilization',
+    'aiAPMemoryFree': 'ap/%s/mem_free',
+    'aiAPTotalMemory': 'ap/%s/mem_total',
+
+    # Custom stats
+    'ap_mem_free': 'ap/%s/mem_free_percentage',
+    'ap_clients': 'ap/%s/clients',
+    'ssid_connected': 'ssid/%s',
+    'ssid_connected_total': 'ssid/all',
+}
