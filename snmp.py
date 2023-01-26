@@ -60,6 +60,10 @@ def gather(host, port, community):
         mac = index[0].prettyPrint()
         idx = index[1]
 
+        if mac not in apStats.keys():
+            # AP appeared during stat retrieval
+            continue
+
         if label == 'aiWlanESSID':
             apStats[mac]['ssid'].insert(idx, value)
         elif label == 'aiWlanMACAddress':
